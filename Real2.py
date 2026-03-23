@@ -1,3 +1,6 @@
+@app.route('/')
+def home():
+    return "Server is Awake", 200
 import os
 from flask import Flask, request, jsonify
 import requests

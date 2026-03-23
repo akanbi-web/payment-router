@@ -1,6 +1,3 @@
-@app.route('/')
-def home():
-    return "Server is Awake", 200
 import os
 from flask import Flask, request, jsonify
 import requests
@@ -8,10 +5,15 @@ import uuid
 
 app = Flask(__name__)
 
-# This manually pulls keys from your .env file
-PAYSTACK_KEY = os.environ.get("PAYSTACK_KEY")
-FLUTTERWAVE_KEY = os.environ.get("FLUTTERWAVE_KEY")
+# 🔒 Keys (Uses Render Environment Variables first)
+PAYSTACK_KEY = os.environ.get("PAYSTACK_KEY", "sk_test_5eadb3c1f2a7cf879f5609d20c7418d4f71d59bb")
+FLUTTERWAVE_KEY = os.environ.get("FLUTTERWAVE_KEY", "FLWSECK_TEST-af44efeba76ef235866efd3b99cfc4df-X")
 CUSTOMER_EMAIL = "Ahmedridwan794@gmail.com"
+
+# 🏠 HOME ROUTE (For Cron-job to ping)
+@app.route('/')
+def home():
+    return "Payment Router is Awake! 🚀", 200
 
 def smart_router(amount, email):
     unique_ref = f"txn_{uuid.uuid4().hex[:10]}"
@@ -22,7 +24,7 @@ def smart_router(amount, email):
         headers = {"Authorization": f"Bearer {PAYSTACK_KEY}"}
         payload = {"email": email, "amount": int(amount) * 100}
 
-        # Timer set to 3 seconds
+        # ⏱️ 3-second timeout
         res = requests.post(url, json=payload, headers=headers, timeout=3)
         data = res.json()
 
